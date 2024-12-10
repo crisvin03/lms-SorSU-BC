@@ -67,6 +67,13 @@ $total_pages = ceil($total_courses / $limit);
             background-color: #b30000;
             color: #fff;
         }
+        .pagination {
+            justify-content: center;
+        }
+        .pagination .active .page-link {
+            background-color: #800000;
+            border-color: #800000;
+        }
     </style>
 </head>
 <body class="bg-light">

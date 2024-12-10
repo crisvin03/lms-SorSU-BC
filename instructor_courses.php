@@ -16,14 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_course'])) {
 
     // Prepare statement to assign the course to the instructor
     $stmt = $conn->prepare("INSERT INTO instructor_courses (instructor_id, course_id) VALUES (?, ?)");
-    $stmt->bind_param("ii", $instructor_id, $course_id);
+$stmt->bind_param("ii", $instructor_db_id, $course_id);
 
-    if ($stmt->execute()) {
-        $message = "Course assigned successfully.";
-    } else {
-        $message = "Error assigning course: " . $stmt->error;
-    }
-    $stmt->close();
+if ($stmt->execute()) {
+    $message = "Course assigned successfully.";
+} else {
+    $message = "Error assigning course: " . $stmt->error;
+}
+$stmt->close();
 }
 
 // Fetch courses assigned to the instructor
