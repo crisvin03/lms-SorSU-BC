@@ -74,21 +74,23 @@ while ($stmt->fetch()) {
 $stmt->close();
 
 // Fetch announcements
-$stmt = $conn->prepare("SELECT title, content, date_posted FROM announcements ORDER BY date_posted DESC LIMIT 5");
+$stmt = $conn->prepare("SELECT title, content, date_posted, image_path FROM announcements ORDER BY date_posted DESC LIMIT 5");
 if (!$stmt) {
     die("Query Error: " . $conn->error);
 }
 $stmt->execute();
-$stmt->bind_result($announcement_title, $announcement_content, $announcement_date);
+$stmt->bind_result($announcement_title, $announcement_content, $announcement_date, $announcement_image_path);
 $announcements = [];
 while ($stmt->fetch()) {
     $announcements[] = [
         'title' => $announcement_title,
         'content' => $announcement_content,
-        'date_posted' => $announcement_date
+        'date_posted' => $announcement_date,
+        'image_path' => $announcement_image_path
     ];
 }
 $stmt->close();
+
 
 // Get department name from session
 $department = isset($_SESSION['department']) ? $_SESSION['department'] : 'DCIT';
@@ -208,28 +210,30 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'dashboard';
         <h2 class="text-center text-maroon">Dashboard Overview</h2>
         <p class="text-center">This section contains an overview of instructor-specific features and tools.</p>
     </div>
-   <!-- Announcements -->
-   <div id="announcements-section" class="mb-4">
-                <h3>Announcements</h3>
-                <?php if (count($announcements) > 0): ?>
-                    <?php foreach ($announcements as $announcement): ?>
-                        <div class="card mb-2">
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($announcement['title']); ?></h5>
-                                <p class="card-text"><?php echo nl2br(htmlspecialchars($announcement['content'])); ?></p>
-                                <small class="text-muted">Posted on: <?php echo htmlspecialchars($announcement['date_posted']); ?></small>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="card">
-                        <div class="card-body">
-                            <p>No announcements available.</p>
-                        </div>
-                    </div>
-                <?php endif; ?>
+    <div id="announcements-section" class="mb-4">
+    <h3>Announcements</h3>
+    <?php if (count($announcements) > 0): ?>
+        <?php foreach ($announcements as $announcement): ?>
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5 class="card-title"><?php echo htmlspecialchars($announcement['title']); ?></h5>
+                    <?php if (!empty($announcement['image_path'])): ?>
+                        <img src="<?php echo htmlspecialchars($announcement['image_path']); ?>" alt="Announcement Image" class="img-fluid mb-2">
+                        <?php endif; ?>
+                    <p class="card-text"><?php echo nl2br(htmlspecialchars($announcement['content'])); ?></p>
+                    <small class="text-muted">Posted on: <?php echo htmlspecialchars($announcement['date_posted']); ?></small>
+                </div>
             </div>
-                    
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="card">
+            <div class="card-body">
+                <p>No announcements available.</p>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
+
 <script>
     const sidebar = document.getElementById('sidebar');
     const contentContainer = document.getElementById('contentContainer');
