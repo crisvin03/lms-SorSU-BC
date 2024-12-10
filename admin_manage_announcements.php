@@ -109,6 +109,5 @@ $announcements = $result->fetch_all(MYSQLI_ASSOC);
         <?php endforeach; ?>
     </ul>
 </div>
-
 </body>
 </html>

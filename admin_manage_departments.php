@@ -44,66 +44,101 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_department'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Departments</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
         }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        form {
-            margin-bottom: 20px;
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
         }
         .message {
             color: green;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .btn-custom {
+            background-color: #800000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-custom:hover {
+            background-color: #800000;
+        }
+        table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        table th {
+            background-color: #007bff;
+            color: #fff;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
     </style>
 </head>
 <body>
-    <h1>Manage Departments</h1>
+    <div class="container">
+        <h1 class="text-center mb-4">Manage Departments</h1>
 
-    <!-- Display success or error message -->
-    <?php if (isset($message)) { ?>
-        <p class="message"><?php echo $message; ?></p>
-    <?php } ?>
+        <!-- Display success or error message -->
+        <?php if (isset($message)) { ?>
+            <div class="alert alert-success"><?php echo $message; ?></div>
+        <?php } ?>
 
-    <!-- Form to Add Department -->
-    <form method="POST">
-        <label for="department_name">Department Name:</label>
-        <input type="text" id="department_name" name="department_name" placeholder="Enter Department Name" required>
-        <button type="submit" name="add_department">Add Department</button>
-    </form>
+        <!-- Form to Add Department -->
+        <form method="POST" class="d-flex justify-content-between align-items-center">
+            <input type="text" id="department_name" name="department_name" class="form-control me-2" placeholder="Enter Department Name" required>
+            <button type="submit" name="add_department" class="btn btn-custom">Add Department</button>
+        </form>
 
-    <!-- Display Existing Departments -->
-    <h2>Existing Departments</h2>
-    <?php
-    // Fetch all departments
-    $sql = "SELECT * FROM departments ORDER BY created_at DESC";
-    $result = $conn->query($sql);
+        <!-- Display Existing Departments -->
+        <h2 class="text-center mt-4">Existing Departments</h2>
+        <?php
+        // Fetch all departments
+        $sql = "SELECT * FROM departments ORDER BY created_at DESC";
+        $result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
-        echo "<table>
-                <tr>
-                    <th>ID</th>
-                    <th>Department Name</th>
-                    <th>Created At</th>
-                </tr>";
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>
-                    <td>" . $row['department_id'] . "</td>
-                    <td>" . $row['department_name'] . "</td>
-                    <td>" . $row['created_at'] . "</td>
-                  </tr>";
+        if ($result->num_rows > 0) {
+            echo "<table class='table table-bordered table-striped'>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Department Name</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>";
+            while ($row = $result->fetch_assoc()) {
+                echo "<tr>
+                        <td>" . $row['department_id'] . "</td>
+                        <td>" . $row['department_name'] . "</td>
+                        <td>" . $row['created_at'] . "</td>
+                      </tr>";
+            }
+            echo "</tbody></table>";
+        } else {
+            echo "<p class='text-center'>No departments found.</p>";
         }
-        echo "</table>";
-    } else {
-        echo "<p>No departments found.</p>";
-    }
-    ?>
+        ?>
+    </div>
 </body>
 </html>
