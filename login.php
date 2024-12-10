@@ -217,6 +217,26 @@ body, html {
     display: flex;
     flex-direction: column;
 }
+/* Snowflake Styling */
+.snowflake {
+            position: absolute;
+            color: white;
+            font-size: 1rem;
+            opacity: 0.8;
+            animation: fall 8s linear infinite;
+        }
+
+        /* Animation for falling snowflakes */
+        @keyframes fall {
+            0% {
+                transform: translateY(-100%);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
 
 .login-form .form-group {
     display: flex;
@@ -469,7 +489,7 @@ body {
 
 <div class="container">
     <div class="image-container">
-        <img src="assets/images/sorsu.jpg" alt="Education">
+        <img src="assets/images/SorSU-BC.jpg" alt="Education">
     </div>
 
     <div class="login-form-container">
@@ -530,6 +550,7 @@ body {
 </div>
 
 <script>
+    
     // Display the popup if there's an error
     <?php if (isset($error) || isset($message)): ?>
     document.getElementById('popup-overlay').classList.add('active');
@@ -562,7 +583,48 @@ body {
         loginForm.style.display = 'block';
     });
     });
+    
 </script>
+
+<script>
+    // Snowflakes Effect
+    function createSnowflake() {
+        const snowflake = document.createElement('div');
+        snowflake.className = 'snowflake';
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+        snowflake.style.opacity = Math.random();
+        document.body.appendChild(snowflake);
+
+        setTimeout(() => {
+            snowflake.remove();
+        }, 5000);
+    }
+
+    setInterval(createSnowflake, 100);
+
+</script>
+<style>
+    .portal-text {
+        font-size: 36px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #fff;
+        position: relative;
+        text-shadow: 0 0 10px red, 0 0 20px green, 0 0 30px blue;
+        animation: glow 2s infinite alternate;
+    }
+
+    @keyframes glow {
+        0% {
+            text-shadow: 0 0 5px red, 0 0 10px green, 0 0 15px blue;
+        }
+        100% {
+            text-shadow: 0 0 20px green, 0 0 25px red, 0 0 30px blue;
+        }
+    }
+</style>
 
 </body>
 </html>

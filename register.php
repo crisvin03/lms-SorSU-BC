@@ -191,7 +191,7 @@ if (!empty($_SESSION['message'])) {
                 <label for="department" class="form-label"><i class="fas fa-building"></i> Department:</label>
                 <select name="department" id="department" class="form-select" required>
                     <option value="DICT" <?php echo (isset($department) && $department == 'DICT') ? 'selected' : ''; ?>>DICT</option>
-                    <option value="BEED" <?php echo (isset($department) && $department == 'BEED') ? 'selected' : ''; ?>>BME</option>
+                    <option value="BEED" <?php echo (isset($department) && $department == 'BME') ? 'selected' : ''; ?>>BME</option>
                 </select>
             </div>
             <div class="d-grid gap-2">

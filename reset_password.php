@@ -21,9 +21,15 @@ if (isset($_GET['token'])) {
         $stmt->bind_result($id, $email, $reset_token, $token_expiry);
         $stmt->fetch();
 
-        // Check if the token has expired (1-hour expiration)
+        // Convert token_expiry to Unix timestamp for comparison
         $current_time = time();
-        if ($current_time > strtotime($token_expiry)) {
+        $expiry_time = strtotime($token_expiry);
+
+        // Set the token expiration to 1 hour (3600 seconds)
+        $token_lifetime = 3600; // 1 hour in seconds
+        $expiry_limit = $expiry_time + $token_lifetime;
+
+        if ($current_time > $expiry_limit) {
             // Token has expired
             $error = "The password reset token has expired. Please request a new one.";
         } else {
@@ -39,8 +45,8 @@ if (isset($_GET['token'])) {
                     $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
 
                     // Update the password in the database and reset token and expiry
-                    $stmt = $conn->prepare("UPDATE users SET password = ?, reset_token = NULL, token_expiry = NULL WHERE reset_token = ?");
-                    $stmt->bind_param("ss", $hashed_password, $token);
+                    $stmt = $conn->prepare("UPDATE users SET password = ?, reset_token = NULL, token_expiry = NULL WHERE id = ?");
+                    $stmt->bind_param("si", $hashed_password, $id);
                     $stmt->execute();
 
                     $success = "Your password has been reset successfully.";
@@ -185,7 +191,7 @@ if (isset($_GET['token'])) {
 
 <div class="container">
     <div class="image-container">
-        <img src="assets/images/sorsu.jpg" alt="Education">
+        <img src="assets/images/SorSU-BC.jpg" alt="Education">
     </div>
 
     <div class="login-form-container">
