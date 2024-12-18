@@ -17,8 +17,8 @@ if (isset($_GET['token'])) {
         if ($status === 'approved') {
             echo "Your email is already verified. <a href='login.php'>Login here</a>";
         } else {
-            // Approve the user and remove the token
-            $update_stmt = $conn->prepare("UPDATE users SET status = 'approved', verification_token = NULL WHERE id = ?");
+            // Approve the user, set email_verified to 1, and remove the token
+            $update_stmt = $conn->prepare("UPDATE users SET status = 'approved', verification_token = NULL, email_verified = 1 WHERE id = ?");
             $update_stmt->bind_param("i", $id);
             if ($update_stmt->execute()) {
                 echo "Your email has been successfully verified. You can now <a href='login.php'>log in</a>.";

@@ -34,6 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($password) < 8) {
         $message = "Password must be at least 8 characters long.";
         $message_type = "danger";
+    } 
+            // Validate password match
+    elseif ($new_password !== $confirm_password) {
+        $message = "Passwords do not match.";
+        $message_type = "danger";
     } else {
         // Check if the email or name is already registered
         $stmt = $conn->prepare("SELECT id FROM users WHERE email = ? OR (first_name = ? AND last_name = ?)");
@@ -177,9 +182,15 @@ if (!empty($_SESSION['message'])) {
                 <input type="email" name="email" id="email" class="form-control" value="<?php echo isset($email) ? $email : ''; ?>" required>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label"><i class="fas fa-lock"></i> Password:</label>
-                <input type="password" name="password" id="password" class="form-control" required>
-            </div>
+    <label for="password" class="form-label"><i class="fas fa-lock"></i> Password:</label>
+    <input type="password" name="password" id="password" class="form-control" required>
+</div>
+<div class="mb-3">
+    <label for="confirm_password" class="form-label"><i class="fas fa-lock"></i> Confirm Password:</label>
+    <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+</div>
+<div id="password-error" class="text-danger" style="display: none;">Passwords do not match.</div>
+
             <div class="mb-3">
                 <label for="role" class="form-label"><i class="fas fa-user-tag"></i> Role:</label>
                 <select name="role" id="role" class="form-select" required>
@@ -202,9 +213,34 @@ if (!empty($_SESSION['message'])) {
         <div class="mt-3 text-center">
             <p>Already have an account? <a href="login.php" class="back-to-login">Login here</a></p>
         </div>
-    </div>
+    </div> 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Get the password and confirm password fields
+    const passwordField = document.getElementById("password");
+    const confirmPasswordField = document.getElementById("confirm_password");
+    const errorMessage = document.getElementById("password-error");
+
+    // Event listener to check if passwords match when the user types in the confirm password field
+    confirmPasswordField.addEventListener("input", function() {
+        if (passwordField.value !== confirmPasswordField.value) {
+            errorMessage.style.display = "block";  // Show error message
+        } else {
+            errorMessage.style.display = "none";  // Hide error message
+        }
+    });
+
+    // Prevent form submission if passwords do not match
+    const form = document.querySelector("form");
+    form.addEventListener("submit", function(event) {
+        if (passwordField.value !== confirmPasswordField.value) {
+            errorMessage.style.display = "block";  // Show error message
+            event.preventDefault();  // Prevent form submission
+        }
+    });
+</script>
+
 </body>
 </html>

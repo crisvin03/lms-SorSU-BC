@@ -44,101 +44,149 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_department'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Departments</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --maroon: #800000;
+            --maroon-light: #a52a2a;
+            --maroon-dark: #5c0000;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            margin: auto;
-        }
-        .message {
-            color: green;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .btn-custom {
-            background-color: #800000;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        .btn-custom:hover {
-            background-color: #800000;
-        }
-        table {
-            margin-top: 20px;
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table th, table td {
-            padding: 10px;
-            border: 1px solid #ddd;
+
+        .admin-header {
+            background: linear-gradient(to right, var(--maroon), var(--maroon-light));
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
             text-align: center;
         }
-        table th {
-            background-color: #007bff;
-            color: #fff;
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-        table tr:nth-child(even) {
-            background-color: #f9f9f9;
+
+        .btn-maroon {
+            background-color: var(--maroon);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-maroon:hover {
+            background-color: var(--maroon-dark);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .table {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table thead {
+            background-color: var(--maroon);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            background-color: white;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-center mb-4">Manage Departments</h1>
-
-        <!-- Display success or error message -->
-        <?php if (isset($message)) { ?>
-            <div class="alert alert-success"><?php echo $message; ?></div>
-        <?php } ?>
-
-        <!-- Form to Add Department -->
-        <form method="POST" class="d-flex justify-content-between align-items-center">
-            <input type="text" id="department_name" name="department_name" class="form-control me-2" placeholder="Enter Department Name" required>
-            <button type="submit" name="add_department" class="btn btn-custom">Add Department</button>
-        </form>
-
-        <!-- Display Existing Departments -->
-        <h2 class="text-center mt-4">Existing Departments</h2>
-        <?php
-        // Fetch all departments
-        $sql = "SELECT * FROM departments ORDER BY created_at DESC";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            echo "<table class='table table-bordered table-striped'>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Department Name</th>
-                            <th>Created At</th>
-                        </tr>
-                    </thead>
-                    <tbody>";
-            while ($row = $result->fetch_assoc()) {
-                echo "<tr>
-                        <td>" . $row['department_id'] . "</td>
-                        <td>" . $row['department_name'] . "</td>
-                        <td>" . $row['created_at'] . "</td>
-                      </tr>";
-            }
-            echo "</tbody></table>";
-        } else {
-            echo "<p class='text-center'>No departments found.</p>";
-        }
-        ?>
+    <!-- Admin Header -->
+    <div class="admin-header">
+        <h1 class="display-5"><i class="fas fa-building me-2"></i>Manage Departments</h1>
+        <p class="lead">Add, Edit, and Organize Your Departments</p>
     </div>
+
+    <div class="container">
+        <!-- Display Success or Error Message -->
+        <?php if (isset($_GET['message'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <?php echo htmlspecialchars($_GET['message']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
+        <!-- Add Department Form -->
+        <div class="mb-3 text-start">
+            <form method="POST" class="d-flex">
+                <input type="text" id="department_name" name="department_name" class="form-control me-2" placeholder="Enter Department Name" required>
+                <button type="submit" name="add_department" class="btn btn-maroon">
+                    <i class="fas fa-plus me-2"></i>Add Department
+                </button>
+            </form>
+        </div>
+
+        <!-- Departments Table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Department Name</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            // Fetch all departments
+                            $sql = "SELECT * FROM departments ORDER BY created_at DESC";
+                            $result = $conn->query($sql);
+
+                            if ($result->num_rows > 0):
+                                while ($row = $result->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><?php echo $row['department_id']; ?></td>
+                                        <td><?php echo htmlspecialchars($row['department_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['created_at']); ?></td>
+                                        <td>
+                                            <a href="admin_delete_departments.php?id=<?php echo $row['department_id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this department?');">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                                        <h4 class="text-muted">No departments found</h4>
+                                        <p>Add your first department to manage them here.</p>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-3 bg-light text-muted">
+        &copy; <?php echo date('Y'); ?> Admin Dashboard. All Rights Reserved.
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -2,8 +2,8 @@
 session_start();
 include 'config.php';
 
-// Check if the user is logged in and is an instructor
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'instructor') {
+// Check if the user is logged in and is an admin
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
 }
@@ -13,17 +13,16 @@ $success_message = '';
 $error_message = '';
 $user_id = $_SESSION['user_id'];
 
-// Fetch instructor profile details
-$query = $conn->prepare("SELECT first_name, last_name, email, department, profile_picture FROM users WHERE id = ?");
+// Fetch admin profile details
+$query = $conn->prepare("SELECT first_name, last_name, email, profile_picture FROM users WHERE id = ?");
 $query->bind_param("i", $user_id);
 $query->execute();
 $result = $query->get_result();
-$instructor = $result->fetch_assoc();
+$admin = $result->fetch_assoc();
 
-$instructor_name = $instructor['first_name'] . ' ' . $instructor['last_name'];
-$email = $instructor['email'];
-$department = $instructor['department'];
-$profile_picture = $instructor['profile_picture'] ?: 'default.png';
+$admin_name = $admin['first_name'] . ' ' . $admin['last_name'];
+$email = $admin['email'];
+$profile_picture = $admin['profile_picture'] ?: 'default.png';
 
 // Handle profile picture upload
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) {
@@ -103,25 +102,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['old_password']) && is
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Management</title>
-    <!-- Bootstrap CSS -->
+    <title>Admin Profile Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --maroon: #800000;
             --maroon-light: #a52a2a;
             --maroon-dark: #5c0000;
+            --white: #ffffff;
+            --light-gray: #f4f6f9;
+            --dark-gray: #6c757d;
         }
 
         body {
-            background-color: #f4f6f9;
+            background-color: var(--light-gray);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         /* Header Section */
         .header {
             background: linear-gradient(to right, var(--maroon), var(--maroon-light));
-            color: white;
+            color: var(--white);
             padding: 20px 0;
             text-align: center;
             margin-bottom: 30px;
@@ -133,15 +135,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['old_password']) && is
         }
 
         .card {
+            background-color: var(--white);
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background-color: white;
             margin-bottom: 30px;
+            padding: 20px;
         }
 
         .profile-pic {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid var(--maroon);
@@ -149,13 +152,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['old_password']) && is
 
         .btn-maroon {
             background-color: var(--maroon);
-            color: white;
+            color: var(--white);
             border: none;
         }
 
         .btn-maroon:hover {
             background-color: var(--maroon-dark);
-            color: white;
+            color: var(--white);
         }
 
         label {
@@ -167,46 +170,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['old_password']) && is
         }
 
         footer {
-            background-color: #f8f9fa;
-            color: #6c757d;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
             padding: 10px 0;
             text-align: center;
         }
+
+        .section-icon {
+            font-size: 1.5rem;
+            color: var(--maroon);
+            margin-right: 10px;
+        }
+
     </style>
 </head>
 <body>
 
 <!-- Header Section -->
 <div class="header">
-    <h2><i class="fas fa-user-circle me-2"></i>Profile Management</h2>
+    <h2><i class="fas fa-user-circle me-2"></i>Admin Profile</h2>
     <p class="lead">Manage your profile details and settings</p>
 </div>
 
-<div class="container">
+<div class="container mt-5">
 
     <!-- Success or Error Messages -->
-    <?php if (!empty($success_message)): ?>
+    <?php if ($success_message): ?>
         <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
     <?php endif; ?>
-    <?php if (!empty($error_message)): ?>
+    <?php if ($error_message): ?>
         <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
     <?php endif; ?>
 
     <!-- Profile Card -->
-    <div class="card p-4">
-        <div class="d-flex align-items-center">
+    <div class="card profile-card mb-4">
+        <div class="card-body d-flex align-items-center">
             <img src="uploads/<?php echo htmlspecialchars($profile_picture); ?>" alt="Profile Picture" class="profile-pic me-4">
             <div>
-                <h4 class="fw-bold"><?php echo htmlspecialchars($instructor_name); ?></h4>
+                <h5><?php echo htmlspecialchars($admin_name); ?></h5>
                 <p><i class="fas fa-envelope me-2"></i>Email: <?php echo htmlspecialchars($email); ?></p>
-                <p><i class="fas fa-building me-2"></i>Department: <?php echo htmlspecialchars($department); ?></p>
             </div>
         </div>
     </div>
 
-    <!-- Upload Profile Picture -->
-    <div class="card p-4">
-        <h4 class="mb-3"><i class="fas fa-upload me-2"></i>Upload Profile Picture</h4>
+    <!-- Upload Profile Picture Form -->
+    <div class="upload-section">
+        <h4><i class="fas fa-upload section-icon"></i>Upload Profile Picture</h4>
         <form method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="profile_picture" class="form-label">Choose a new profile picture</label>
@@ -216,21 +225,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['old_password']) && is
         </form>
     </div>
 
-    <!-- Change Password -->
-    <div class="card p-4">
-        <h4 class="mb-3"><i class="fas fa-lock me-2"></i>Change Password</h4>
+    <!-- Change Password Form -->
+    <div class="password-section">
+        <h4><i class="fas fa-lock section-icon"></i>Change Password</h4>
         <form method="POST" action="">
             <div class="mb-3">
                 <label for="old_password" class="form-label">Old Password</label>
-                <input type="password" class="form-control" id="old_password" name="old_password" placeholder="Enter old password" required>
+                <input type="password" class="form-control" id="old_password" name="old_password" required>
             </div>
             <div class="mb-3">
                 <label for="new_password" class="form-label">New Password</label>
-                <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Enter new password" required>
+                <input type="password" class="form-control" id="new_password" name="new_password" required>
             </div>
             <div class="mb-3">
                 <label for="confirm_password" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm new password" required>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
             </div>
             <button type="submit" class="btn btn-maroon">Change Password</button>
         </form>
@@ -242,8 +251,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['old_password']) && is
     &copy; <?php echo date('Y'); ?> Profile Management System. All Rights Reserved.
 </footer>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 </body>
 </html>
+

@@ -200,38 +200,42 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'dashboard';
     <a href="student_attendance.php" class="menu-item"><i class="fas fa-users"></i> <span>Attendance</span></a>
     <a href="student_courses.php" class="menu-item"><i class="fas fa-calendar-check"></i> <span>Courses</span></a>
     <a href="student_profile.php" class="menu-item"><i class="fas fa-user"></i> <span>View Profile</span></a>
+    <a href="student_status.php" class="menu-item"><i class="fas fa-pen-square text-white"></i> <span>Enrollment Status</span></a>
     <a href="logout.php" class="menu-item"><i class="fas fa-sign-out-alt"></i> <span>Log Out</span></a>
 </div>
 
 <!-- Main Content -->
 <div class="content-container" id="contentContainer">
-    <h1 class="content-header"><i class="fas fa-chalkboard"></i> Welcome to Your Dashboard</h1>
-    <div class="card p-4">
+    <h1 class="content-header text-center my-4"><i class="fas fa-chalkboard"></i> Welcome to Your Dashboard</h1>
+    
+    <div class="card p-4 mb-4 shadow">
         <h2 class="text-center text-maroon">Dashboard Overview</h2>
-        <p class="text-center">This section contains an overview of instructor-specific features and tools.</p>
+        <p class="text-center">This section contains an overview of student-specific features and tools.</p>
     </div>
+    
     <div id="announcements-section" class="mb-4">
-    <h3>Announcements</h3>
-    <?php if (count($announcements) > 0): ?>
-        <?php foreach ($announcements as $announcement): ?>
-            <div class="card mb-2">
-                <div class="card-body">
-                    <h5 class="card-title"><?php echo htmlspecialchars($announcement['title']); ?></h5>
-                    <?php if (!empty($announcement['image_path'])): ?>
-                        <img src="<?php echo htmlspecialchars($announcement['image_path']); ?>" alt="Announcement Image" class="img-fluid mb-2">
+        <h3 class="text-maroon">Announcements</h3>
+        <?php if (count($announcements) > 0): ?>
+            <?php foreach ($announcements as $announcement): ?>
+                <div class="card mb-2 shadow">
+                    <div class="card-body">
+                        <h5 class="card-title"><?php echo htmlspecialchars($announcement['title']); ?></h5>
+                        <?php if (!empty($announcement['image_path'])): ?>
+                            <img src="<?php echo htmlspecialchars($announcement['image_path']); ?>" alt="Announcement Image" class="img-fluid mb-2">
                         <?php endif; ?>
-                    <p class="card-text"><?php echo nl2br(htmlspecialchars($announcement['content'])); ?></p>
-                    <small class="text-muted">Posted on: <?php echo htmlspecialchars($announcement['date_posted']); ?></small>
+                        <p class="card-text"><?php echo nl2br(htmlspecialchars($announcement['content'])); ?></p>
+                        <small class="text-muted">Posted on: <?php echo htmlspecialchars($announcement['date_posted']); ?></small>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <p>No announcements available.</p>
                 </div>
             </div>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <div class="card">
-            <div class="card-body">
-                <p>No announcements available.</p>
-            </div>
-        </div>
-    <?php endif; ?>
+        <?php endif; ?>
+    </div>
 </div>
 
 <script>

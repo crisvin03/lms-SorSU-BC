@@ -34,13 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bind_param("ss", $token, $email);
                 $stmt->execute();
 
-                // Send email with reset link using PHPMailer
-                $reset_link = "http://127.0.0.1/student_managementdb/reset_password.php?token=" . $token;
+                // Notify the admin about the reset request
+                $admin_email = 'crisvinhabitsuela211@gmail.com';  // Admin's email
 
                 $mail = new PHPMailer(true);  // Instantiate PHPMailer
-
                 try {
-                    // Server settings
+                    // Server settings for admin notification email
                     $mail->isSMTP();  // Send using SMTP
                     $mail->Host = 'smtp.gmail.com';  // Set the SMTP server (use Gmail, etc.)
                     $mail->SMTPAuth = true;
@@ -49,19 +48,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                     $mail->Port = 587;  // SMTP port (587 is standard for TLS)
 
-                    // Recipients
+                    // Admin email content
                     $mail->setFrom('lms.sorsu@gmail.com', 'Mailer');
-                    $mail->addAddress($email);  // Add the recipient email
+                    $mail->addAddress($admin_email);  // Admin email address
 
                     // Content
                     $mail->isHTML(true);
-                    $mail->Subject = 'Password Reset Request';
-                    $mail->Body    = 'Click the following link to reset your password: ' . $reset_link;
+                    $mail->Subject = 'Password Reset Request Notification';
+                    $mail->Body    = 'A password reset request has been made for the user with the email: ' . $email . '. The admin can proceed to change the password manually and notify the user.';
 
-                    // Send email
+                    // Send admin email
                     $mail->send();
                     
-                    $message = "A password recovery link has been sent to your email.";
+                    $message = "An email will be sent to your email address, with instructions how to get access again.";
                 } catch (Exception $e) {
                     $error = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
                 }
@@ -527,7 +526,8 @@ body {
             <label for="email" class="form-label">Enter your email:</label>
             <input type="email" name="email" class="form-control" required>
         </div>
-        <button type="submit" name="forgot_password" class="btn-maroon">Send Recovery Link</button>
+    
+        <button type="submit" name="forgot_password" class="btn-maroon">Send Recovery Request</button>
     </form>
     <p class="mt-3">
         <a href="#" id="back-to-login" class="text-maroon">
@@ -543,7 +543,7 @@ body {
 <!-- Error Popup -->
 <div id="popup-overlay" class="overlay">
     <div class="popup">
-        <h3>Error</h3>
+        <h3>Success</h3>
         <p><?php echo isset($error) ? $error : (isset($message) ? $message : ''); ?></p>
         <button onclick="closePopup()">Close</button>
     </div>
@@ -602,7 +602,7 @@ body {
     }
 
     setInterval(createSnowflake, 100);
-
+    
 </script>
 <style>
     .portal-text {

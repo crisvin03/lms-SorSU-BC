@@ -60,42 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
     }
 }
 
-// Handle password change
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['old_password']) && isset($_POST['new_password']) && isset($_POST['confirm_password'])) {
-    $old_password = $_POST['old_password'];
-    $new_password = $_POST['new_password'];
-    $confirm_password = $_POST['confirm_password'];
-
-    // Check if new password matches the confirm password
-    if ($new_password === $confirm_password) {
-        // Fetch current password hash
-        $stmt = $conn->prepare("SELECT password FROM users WHERE id = ?");
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $current_password_hash = $user['password'];
-
-        // Verify old password
-        if (password_verify($old_password, $current_password_hash)) {
-            // Update new password
-            $new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
-            $update_stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
-            $update_stmt->bind_param("si", $new_password_hash, $user_id);
-            if ($update_stmt->execute()) {
-                $success_message = "Password updated successfully!";
-            } else {
-                $error_message = "Failed to update password. Please try again.";
-            }
-            $update_stmt->close();
-        } else {
-            $error_message = "Incorrect old password.";
-        }
-        $stmt->close();
-    } else {
-        $error_message = "New password and confirm password do not match.";
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -104,82 +68,123 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['old_password']) && is
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile Management</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --maroon: #800000;
+            --maroon-light: #a52a2a;
+            --maroon-dark: #5c0000;
+        }
+
         body {
-            background-color: #f8f9fa;
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .profile-card {
-            padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(to right, var(--maroon), var(--maroon-light));
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
         }
+
+        .header h2 {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-color: white;
+            margin-bottom: 30px;
+        }
+
         .profile-pic {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             object-fit: cover;
+            border: 3px solid var(--maroon);
         }
-        .upload-section, .password-section {
-            margin-top: 30px;
+
+        .btn-maroon {
+            background-color: var(--maroon);
+            color: white;
+            border: none;
+        }
+
+        .btn-maroon:hover {
+            background-color: var(--maroon-dark);
+            color: white;
+        }
+
+        label {
+            font-weight: 500;
+        }
+
+        footer {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            padding: 10px 0;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-<div class="container mt-5">
-    <h2 class="text-maroon">Profile</h2>
-    <?php if ($success_message): ?>
+<!-- Header Section -->
+<div class="header">
+    <h2><i class="fas fa-user-circle me-2"></i>Profile Management</h2>
+    <p class="lead">Manage your profile details and settings</p>
+</div>
+
+<div class="container">
+
+    <!-- Success or Error Messages -->
+    <?php if (!empty($success_message)): ?>
         <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
     <?php endif; ?>
-    <?php if ($error_message): ?>
+    <?php if (!empty($error_message)): ?>
         <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
     <?php endif; ?>
 
-    <div class="card profile-card mb-4">
-        <div class="card-body d-flex align-items-center">
+    <!-- Profile Card -->
+    <div class="card p-4">
+        <div class="d-flex align-items-center">
             <img src="uploads/<?php echo htmlspecialchars($profile_picture); ?>" alt="Profile Picture" class="profile-pic me-4">
             <div>
-                <h5><?php echo htmlspecialchars($student_name); ?></h5>
-                <p>Email: <?php echo htmlspecialchars($email); ?></p>
-                <p>Department: <?php echo htmlspecialchars($department); ?></p>
+                <h4 class="fw-bold"><?php echo htmlspecialchars($student_name); ?></h4>
+                <p><i class="fas fa-envelope me-2"></i>Email: <?php echo htmlspecialchars($email); ?></p>
+                <p><i class="fas fa-building me-2"></i>Department: <?php echo htmlspecialchars($department); ?></p>
             </div>
         </div>
     </div>
 
-    <!-- Upload Profile Picture Form -->
-    <div class="upload-section">
-        <h4>Upload Profile Picture</h4>
+    <!-- Upload Profile Picture -->
+    <div class="card p-4">
+        <h4 class="mb-3"><i class="fas fa-upload me-2"></i>Upload Profile Picture</h4>
         <form method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="profile_picture" class="form-label">Choose a new profile picture</label>
                 <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*" required>
             </div>
-            <button type="submit" class="btn btn-primary">Upload Picture</button>
+            <button type="submit" class="btn btn-maroon">Upload Picture</button>
         </form>
     </div>
 
-    <!-- Change Password Form -->
-    <div class="password-section">
-        <h4>Change Password</h4>
-        <form method="POST" action="">
-            <div class="mb-3">
-                <label for="old_password" class="form-label">Old Password</label>
-                <input type="password" class="form-control" id="old_password" name="old_password" required>
-            </div>
-            <div class="mb-3">
-                <label for="new_password" class="form-label">New Password</label>
-                <input type="password" class="form-control" id="new_password" name="new_password" required>
-            </div>
-            <div class="mb-3">
-                <label for="confirm_password" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Change Password</button>
-        </form>
-    </div>
-</div>
+<!-- Footer -->
+<footer>
+    &copy; <?php echo date('Y'); ?> Profile Management System. All Rights Reserved.
+</footer>
 
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 </body>
 </html>
