@@ -49,3 +49,26 @@ This platform is designed to enhance digital learning by enabling instructors an
 ```bash
 git clone https://github.com/crisvin03/lms-SorSU-BC.git
 cd lms-SorSU-BC
+
+
+2. Configure Environment
+Set up .env file with your local DB credentials
+
+Create a new MySQL database
+
+3. Install Dependencies (for Laravel)
+bash
+Copy
+Edit
+composer install
+npm install && npm run dev
+4. Run Migrations
+bash
+Copy
+Edit
+php artisan migrate
+5. Start the Development Server
+bash
+Copy
+Edit
+php artisan serve
