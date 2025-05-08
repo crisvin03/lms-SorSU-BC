@@ -38,7 +38,7 @@ This platform is designed to enhance digital learning by enabling instructors an
 ## 🛠 Tech Stack
 
 - **Frontend**: HTML, CSS, JavaScript
-- **Backend**: PHP (Laravel or Core PHP)
+- **Backend**: PHP 
 - **Database**: MySQL
 
 ---
