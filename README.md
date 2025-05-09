@@ -2,6 +2,10 @@
 
 A custom Learning Management System built for **Sorsogon State University – Bulan Campus**.  
 This platform is designed to enhance digital learning by enabling instructors and students to manage courses, submit assignments, track performance, and collaborate in a secure, academic environment.
+<p align="center">
+  <img src="assets/images/image.png" width="600" alt="LMS Screenshot">
+</p>
+
 
 ---
 
